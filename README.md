@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/eightynine77/windows-utilities-collection/refs/heads/main/picture.png">
 
-# giga useful utilities
+# windows utilities collection
 a collection of windows batch scripts you can use to make your computing much easier
 
 ## note
