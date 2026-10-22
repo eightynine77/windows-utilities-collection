@@ -3,5 +3,8 @@
 # windows utilities collection
 a collection of windows batch scripts you can use to make your computing much easier
 
+# explanations of some tools
+- `shutdown_menu.exe` - this tool allows you to not only shutdown your windows machine but also reboot.
+
 ## note
-if you spot any batch files with similar names like [piepod.bat](https://github.com/eightynine77/windows-utilities-collection/blob/main/giga%20useful%20utilities/piepod.bat) and [piepod_youtube_downloader.bat](https://github.com/eightynine77/windows-utilities-collection/blob/main/giga%20useful%20utilities/piepod_youtube_downloader.bat) then i want you to know that those files are actually symlink files. so in this case, [piepod.bat](https://github.com/eightynine77/windows-utilities-collection/blob/main/giga%20useful%20utilities/piepod.bat) is the symlink
+if you spot any batch files with similar names like [piepod.bat](https://github.com/eightynine77/windows-utilities-collection/blob/main/giga%20useful%20utilities/piepod.bat) and [piepod_youtube_downloader.bat](https://github.com/eightynine77/windows-utilities-collection/blob/main/giga%20useful%20utilities/piepod_youtube_downloader.bat) then i want you to know that those files are actually symlink files. so in this case, [piepod.bat](https://github.com/eightynine77/windows-utilities-collection/blob/main/giga%20useful%20utilities/piepod.bat) is the symlink.
