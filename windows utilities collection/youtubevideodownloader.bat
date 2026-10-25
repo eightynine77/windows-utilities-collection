@@ -3,6 +3,20 @@ setlocal enabledelayedexpansion
 cls
 color 0f
 
+:: Check for the cookies parameter
+if /I "%~1"=="--cookies" goto :cookiesMenu
+if /I "%~1"=="-c" goto :cookiesMenu
+
+:: Load cookie settings if the file exists
+set "COOKIES_PARAM="
+if exist "%~dp0ytdownloader.settings" (
+    for /f "tokens=1,2 delims==" %%A in ('type "%~dp0ytdownloader.settings"') do (
+        if "%%A"=="cookiesPath" (
+            set "COOKIES_PARAM=--cookies %%B"
+        )
+    )
+)
+
 if exist "%~dp0yt-dlp.exe" (
     set "YTDLP=%~dp0yt-dlp.exe"
 ) else (
@@ -109,7 +123,7 @@ echo Listing available formats for %url%
 echo ===================================
 echo.
 echo.
-%YTDLP% -F --cookies cookies.txt %url%
+%YTDLP% %COOKIES_PARAM% -F %url%
 exit /b
 
 :DownloadWithThumbnail
@@ -132,7 +146,7 @@ set /p format="the format code: "
 echo.
 echo downloading with thumbnail...
 echo.
-%YTDLP% -f %format% --embed-thumbnail --cookies cookies.txt %url%
+%YTDLP% %COOKIES_PARAM% -f %format% --embed-thumbnail %url%
 goto :theend
 
 :DownloadWithoutThumbnail
@@ -155,7 +169,7 @@ set /p format="the format code: "
 echo.
 echo downloading...
 echo.
-%YTDLP% -f %format% --cookies cookies.txt %url%
+%YTDLP% %COOKIES_PARAM% -f %format% %url%
 goto :theend
 
 :theend
@@ -168,3 +182,71 @@ powershell -Command "Write-Host '%~dp0download folder' -ForegroundColor cyan"
 echo.
 echo press any key to close this script...
 pause >nul
+goto :eof
+
+:cookiesMenu
+cls
+echo cookies settings
+echo A) enable cookies
+echo S) change cookies file path
+echo D) disable cookies
+echo.
+CHOICE /C ASD /N /M "press [A], [S] or [D] key to choose: "
+if errorlevel 3 goto :disableCookies
+if errorlevel 2 goto :changeCookies
+if errorlevel 1 goto :enableCookies
+
+:enableCookies
+cls
+echo enter the path to your cookies file.
+echo note: make sure you use quotations for your cookiesfile path. for example: "C:\example\directory\cookies.txt"
+echo.
+echo type "back"/"b" to go back.
+set /p "cookie_path=> "
+
+if /I "%cookie_path%"=="back" goto :cookiesMenu
+if /I "%cookie_path%"=="b" goto :cookiesMenu
+
+:: Validate that the string starts and ends with a quotation mark
+set "first_char=!cookie_path:~0,1!"
+set "last_char=!cookie_path:~-1!"
+if not "!first_char!"=="^"" (
+    echo.
+    echo error: your path must start with a quotation mark.
+    pause
+    goto :enableCookies
+)
+if not "!last_char!"=="^"" (
+    echo.
+    echo error: your path must end with a quotation mark.
+    pause
+    goto :enableCookies
+)
+
+echo cookiesPath=!cookie_path!> "%~dp0ytdownloader.settings"
+echo.
+echo settings saved successfully.
+pause
+goto :cookiesMenu
+
+:changeCookies
+if not exist "%~dp0ytdownloader.settings" (
+    echo.
+    echo settings file not found. enable cookies first.
+    pause
+    goto :cookiesMenu
+)
+start notepad "%~dp0ytdownloader.settings"
+goto :cookiesMenu
+
+:disableCookies
+echo.
+CHOICE /C YN /N /M "do you want to disable cookies? [Y / N]: "
+if errorlevel 2 goto :cookiesMenu
+if errorlevel 1 (
+    if exist "%~dp0ytdownloader.settings" del "%~dp0ytdownloader.settings"
+    echo.
+    echo cookies disabled. settings file deleted.
+    pause
+    goto :cookiesMenu
+)
