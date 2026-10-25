@@ -57,7 +57,7 @@ int main() {
         // _getch() reads a single character from the console without echoing or requiring Enter
         int choice = _getch();
 
-        if (choice == 'A' || choice == 'a') {
+        if (choice == 'A' || choice == 'a' || choice == ' ') {
             // EWX_SHUTDOWN shuts down the system. EWX_FORCE forces applications to close.
             ExitWindowsEx(EWX_SHUTDOWN | EWX_FORCE, SHTDN_REASON_MAJOR_OTHER | SHTDN_REASON_MINOR_OTHER);
             break;
