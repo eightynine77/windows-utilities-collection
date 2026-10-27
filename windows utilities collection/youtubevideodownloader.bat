@@ -48,8 +48,7 @@ if exist "%~dp0ffmpeg.exe" (
         echo if you want to download youtube videos with thumbnail, download ffmpeg: https://ffmpeg.org/download.html
         echo and put ffmpeg in the same folder as this script OR added to the windows environment PATH variable
         goto :input
-    )
-    else (
+    ) else (
         set "FFMPEG=ffmpeg"
         set "HAS_FFMPEG=1"
     )
@@ -190,8 +189,10 @@ echo cookies settings
 echo A) enable cookies
 echo S) change cookies file path
 echo D) disable cookies
+echo W) exit
 echo.
-CHOICE /C ASD /N /M "press [A], [S] or [D] key to choose: "
+CHOICE /C ASDW /N /M "press letter keys on the menu to choose: "
+if errorlevel 4 goto :EOL
 if errorlevel 3 goto :disableCookies
 if errorlevel 2 goto :changeCookies
 if errorlevel 1 goto :enableCookies
@@ -207,18 +208,20 @@ set /p "cookie_path=> "
 if /I "%cookie_path%"=="back" goto :cookiesMenu
 if /I "%cookie_path%"=="b" goto :cookiesMenu
 
-:: Validate that the string starts and ends with a quotation mark
-set "first_char=!cookie_path:~0,1!"
-set "last_char=!cookie_path:~-1!"
-if not "!first_char!"=="^"" (
+:: Create a temporary file containing the regex pattern
+set "cookie_regex_file=%TEMP%\cookie_quote_%RANDOM%_%RANDOM%.txt"
+> "!cookie_regex_file!" echo(".*"
+
+:: Validate that the input starts and ends with a double quote
+echo(!cookie_path!| findstr /r /x /g:"!cookie_regex_file!" >nul
+set "cookie_path_is_quoted=!errorlevel!"
+
+:: Remove the temporary regex file
+del "!cookie_regex_file!" >nul 2>&1
+
+if not "!cookie_path_is_quoted!"=="0" (
     echo.
-    echo error: your path must start with a quotation mark.
-    pause
-    goto :enableCookies
-)
-if not "!last_char!"=="^"" (
-    echo.
-    echo error: your path must end with a quotation mark.
+    echo error: your path must start and end with a quotation mark.
     pause
     goto :enableCookies
 )
@@ -240,13 +243,21 @@ start notepad "%~dp0ytdownloader.settings"
 goto :cookiesMenu
 
 :disableCookies
+if not exist "%~dp0ytdownloader.settings" (
+    echo.
+    echo settings file not found. cookies are already disabled.
+    pause
+    goto :cookiesMenu
+)
 echo.
 CHOICE /C YN /N /M "do you want to disable cookies? [Y / N]: "
 if errorlevel 2 goto :cookiesMenu
 if errorlevel 1 (
-    if exist "%~dp0ytdownloader.settings" del "%~dp0ytdownloader.settings"
+    del "%~dp0ytdownloader.settings"
     echo.
     echo cookies disabled. settings file deleted.
     pause
     goto :cookiesMenu
 )
+
+:EOL
